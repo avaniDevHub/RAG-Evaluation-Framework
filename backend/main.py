@@ -1,39 +1,57 @@
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from schemas import EvaluationRequest
-from evaluator.search_metrics import hit_rate, precision_at_k
-from evaluator.answer_metrics import (
-    faithfulness_score,
-    relevance_score,
-    completeness_score
-)
+from dotenv import load_dotenv
+import os
+import json
 
-app = FastAPI(title="RAG Evaluation Framework")
+load_dotenv()
 
-# ✅ CORS FIX (THIS IS CRITICAL)
+from fastapi import FastAPI
+from schemas import EvaluateRequest
+from rag.pipeline import run_rag
+from evaluator.judge import evaluate
+
+app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # frontend origin
+    allow_origins=["http://localhost:5173"],  # frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.post("/evaluate")
-def evaluate(payload: EvaluationRequest):
-    hit = hit_rate(payload.search_results)
-    precision = precision_at_k(payload.search_results)
 
-    context = " ".join([doc.content for doc in payload.search_results])
+# Safe path resolution
+BASE_DIR = os.path.dirname(__file__)
+with open(os.path.join(BASE_DIR, "data", "ground_truth.json")) as f:
+    GROUND_TRUTH = {
+        d["question"]: d["relevant_chunks"]
+        for d in json.load(f)
+    }
+
+@app.post("/evaluate")
+def evaluate_rag(req: EvaluateRequest):
+    question, retrieved, answer = run_rag(req.question)
+
+    metrics = evaluate(
+        question,
+        retrieved,
+        answer,
+        GROUND_TRUTH.get(question, [])
+    )
+
+    # 🔴 IMPORTANT FIX: serialize LangChain Documents
+    retrieved_chunks = [
+        {
+            "content": doc.page_content,
+            "metadata": doc.metadata
+        }
+        for doc in retrieved
+    ]
 
     return {
-        "search_quality": {
-            "hit_rate": hit,
-            "precision@5": precision
-        },
-        "answer_quality": {
-            "faithfulness": faithfulness_score(context, payload.answer),
-            "relevance": relevance_score(payload.question, payload.answer),
-            "completeness": completeness_score(context, payload.answer)
-        }
+        "question": question,
+        "retrieved_chunks": retrieved_chunks,
+        "answer": answer,
+        "metrics": metrics
     }

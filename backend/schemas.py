@@ -6,7 +6,5 @@ class SearchResult(BaseModel):
     content: str
     relevant: bool
 
-class EvaluationRequest(BaseModel):
+class EvaluateRequest(BaseModel):
     question: str
-    search_results: List[SearchResult]
-    answer: str

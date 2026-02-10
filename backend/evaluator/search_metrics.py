@@ -1,12 +1,10 @@
-def hit_rate(search_results):
-    for doc in search_results:
-        if doc.relevant:
-            return 1
-    return 0
+def hit_rate(retrieved, ground_truth):
+    return int(any(gt in chunk for gt in ground_truth for chunk in retrieved))
 
-def precision_at_k(search_results, k=5):
-    top_k = search_results[:k]
-    if not top_k:
-        return 0
-    relevant = sum(1 for doc in top_k if doc.relevant)
-    return (relevant / len(top_k)) * 100
+def precision_at_k(retrieved, ground_truth, k=5):
+    retrieved_k = retrieved[:k]
+    relevant = sum(
+        1 for chunk in retrieved_k
+        if any(gt in chunk for gt in ground_truth)
+    )
+    return relevant / k

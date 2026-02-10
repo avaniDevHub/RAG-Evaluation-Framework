@@ -1,9 +1,17 @@
-import axios from "axios";
+const API_BASE = "http://127.0.0.1:8000";
 
-const API = axios.create({
-  baseURL: "http://localhost:8000"
-});
+export async function evaluateRAG(question) {
+  const res = await fetch(`${API_BASE}/evaluate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ question })
+  });
 
-export const evaluateRAG = async (payload) => {
-  return await API.post("/evaluate", payload);
-};
+  if (!res.ok) {
+    throw new Error("Backend error");
+  }
+
+  return res.json();
+}

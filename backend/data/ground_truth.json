@@ -1,0 +1,14 @@
+[
+  {
+    "question": "What is Retrieval Augmented Generation?",
+    "relevant_chunks": [
+      "Retrieval Augmented Generation (RAG) is a technique that enhances large language models"
+    ]
+  },
+  {
+    "question": "What does precision@k measure?",
+    "relevant_chunks": [
+      "Precision@k measures how many of the top k retrieved documents are relevant."
+    ]
+  }
+]

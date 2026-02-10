@@ -1,6 +1,24 @@
+# FastAPI backend
 fastapi==0.110.0
 uvicorn==0.29.0
+
+# Data & schemas
 pydantic==1.10.13
 numpy==1.26.4
 pandas==2.1.4
+
+# OpenAI (compatible with LangChain)
 openai==1.12.0
+langchain-openai==0.1.7
+
+# LangChain core
+langchain==0.1.16
+langchain-community==0.0.32
+
+# Retrieval stack
+sentence-transformers==2.6.1
+faiss-cpu==1.8.0
+
+# Environment variables
+python-dotenv==1.0.1
+

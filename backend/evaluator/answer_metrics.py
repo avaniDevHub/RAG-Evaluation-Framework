@@ -1,10 +1,31 @@
-from .judge import llm_judge
+from .llm_judge import llm_judge
 
-def faithfulness_score(context, answer):
-    return llm_judge("faithfulness")
+def faithfulness(answer: str, contexts: list[str]) -> float:
+    """
+    Checks whether the generated answer is supported by the retrieved contexts.
+    """
 
-def relevance_score(question, answer):
-    return llm_judge("relevance")
+    prompt = f"""
+You are an evaluator.
 
-def completeness_score(context, answer):
-    return llm_judge("completeness")
+Answer:
+{answer}
+
+Retrieved Contexts:
+{contexts}
+
+Is the answer supported by the contexts?
+Respond with exactly one of the following:
+SUPPORTED
+PARTIALLY_SUPPORTED
+NOT_SUPPORTED
+"""
+
+    verdict = llm_judge(prompt)
+
+    if "SUPPORTED" in verdict:
+        return 1.0
+    elif "PARTIALLY" in verdict:
+        return 0.5
+    else:
+        return 0.0

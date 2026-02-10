@@ -1,70 +1,77 @@
 import { useState } from "react";
-import { Button, Stack, Typography } from "@mui/material";
-import ScoreCard from "../components/ScoreCard";
-import Charts from "../components/Charts";
 import { evaluateRAG } from "../api";
+import ScoreCard from "../components/ScoreCard";
+import ContextViewer from "../components/ContextViewer";
+import FailureBadge from "../components/FailureBadge";
 
-const Dashboard = () => {
+export default function Dashboard() {
+  const [question, setQuestion] = useState("");
   const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const runEvaluation = async () => {
-    const payload = {
-      question: "How do I reset my password?",
-      search_results: [
-        {
-          document_id: "doc1",
-          content: "To reset your password, go to settings.",
-          relevant: true
-        },
-        {
-          document_id: "doc2",
-          content: "Company history info.",
-          relevant: false
-        }
-      ],
-      answer: "You can reset your password from the settings page."
-    };
-
-    const response = await evaluateRAG(payload);
-    setResult(response.data);
+    setLoading(true);
+    try {
+      const data = await evaluateRAG(question);
+      setResult(data);
+    } catch (e) {
+      alert("Evaluation failed");
+    }
+    setLoading(false);
   };
 
-  const chartData = result
-    ? [
-        { metric: "Faithfulness", score: result.answer_quality.faithfulness },
-        { metric: "Relevance", score: result.answer_quality.relevance },
-        { metric: "Completeness", score: result.answer_quality.completeness }
-      ]
-    : [];
-
   return (
-    <Stack spacing={4} alignItems="center" mt={4}>
-      <Typography variant="h4">
-        RAG Evaluation Dashboard
-      </Typography>
+    <div style={{ padding: 30, maxWidth: "1200px", margin: "0 auto" }}>
 
-      <Button variant="contained" onClick={runEvaluation}>
-        Run Evaluation
-      </Button>
+
+      <h1>RAG Evaluation Dashboard</h1>
+
+      <input
+        value={question}
+        onChange={(e) => setQuestion(e.target.value)}
+        placeholder="Enter your question"
+        style={{ width: "100%", padding: 10 }}
+      />
+
+      <button onClick={runEvaluation} disabled={loading}>
+        {loading ? "Evaluating..." : "Run Evaluation"}
+      </button>
 
       {result && (
         <>
-          <Stack direction="row" spacing={3}>
-            <ScoreCard
-              title="Hit Rate"
-              value={result.search_quality.hit_rate}
-            />
-            <ScoreCard
-              title="Precision@5"
-              value={`${result.search_quality["precision@5"]}%`}
-            />
-          </Stack>
+          <h2>Generated Answer</h2>
+          <div
+  style={{
+    background: "#f9f9f9",
+    padding: "20px 24px",
+    borderRadius: 10,
+    lineHeight: 1.7,
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
+    width: "100%",
+  }}
+>
+  {result.answer}
+</div>
+          <FailureBadge reason={result.metrics.failure_reason} />
 
-          <Charts data={chartData} />
+          <h2>Metrics</h2>
+          <div
+          style={{
+          display: "flex",
+          gap: 20,
+          flexWrap: "wrap",}}
+          >
+
+            <ScoreCard label="Hit Rate" value={result.metrics.hit_rate} />
+            <ScoreCard label="Precision@k" value={result.metrics["precision@k"]} />
+            <ScoreCard label="Faithfulness" value={result.metrics.faithfulness} />
+          </div>
+
+          <h2>Retrieved Contexts</h2>
+          <ContextViewer contexts={result.retrieved_chunks} />
         </>
       )}
-    </Stack>
+    </div>
   );
-};
-
-export default Dashboard;
+}

@@ -1,16 +1,13 @@
-import { Card, CardContent, Typography } from "@mui/material";
-
-const ScoreCard = ({ title, value }) => {
+export default function ScoreCard({ label, value }) {
   return (
-    <Card sx={{ minWidth: 200, textAlign: "center" }}>
-      <CardContent>
-        <Typography variant="h6">{title}</Typography>
-        <Typography variant="h4" color="primary">
-          {value}
-        </Typography>
-      </CardContent>
-    </Card>
+    <div style={{
+      border: "1px solid #ccc",
+      padding: 20,
+      width: 150,
+      textAlign: "center"
+    }}>
+      <h3>{label}</h3>
+      <strong>{value}</strong>
+    </div>
   );
-};
-
-export default ScoreCard;
+}
