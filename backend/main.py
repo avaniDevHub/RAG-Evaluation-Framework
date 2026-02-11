@@ -20,7 +20,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # Safe path resolution
 BASE_DIR = os.path.dirname(__file__)
 with open(os.path.join(BASE_DIR, "data", "ground_truth.json")) as f:

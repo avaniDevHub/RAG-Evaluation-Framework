@@ -1,0 +1,1 @@
+Hit Rate measures whether at least one relevant document appears in the retrieved results.

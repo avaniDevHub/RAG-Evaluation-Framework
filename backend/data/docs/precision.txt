@@ -1,0 +1,1 @@
+Precision@k measures the fraction of the top k retrieved documents that are relevant to a given query.

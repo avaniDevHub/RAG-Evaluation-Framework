@@ -8,7 +8,25 @@
   {
     "question": "What does precision@k measure?",
     "relevant_chunks": [
-      "Precision@k measures how many of the top k retrieved documents are relevant."
+      "Precision@k measures the fraction of the top k retrieved documents that are relevant"
+    ]
+  },
+  {
+    "question": "What is hit rate in information retrieval?",
+    "relevant_chunks": [
+      "Hit Rate measures whether at least one relevant document appears in the retrieved results"
+    ]
+  },
+  {
+    "question": "What is faithfulness in RAG evaluation?",
+    "relevant_chunks": [
+      "Faithfulness measures whether the generated answer is grounded in the retrieved context"
+    ]
+  },
+  {
+    "question": "Explain BLEU score",
+    "relevant_chunks": [
+      "BLEU score evaluates machine translation quality"
     ]
   }
 ]

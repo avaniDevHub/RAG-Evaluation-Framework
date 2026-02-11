@@ -1,0 +1,1 @@
+Faithfulness measures whether the generated answer is grounded in the retrieved context rather than hallucinated content.
